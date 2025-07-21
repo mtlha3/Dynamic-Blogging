@@ -43,7 +43,7 @@ const Login = () => {
         <input
           type="text"
           name="identifier"
-          placeholder="Email or Username"
+          placeholder="Email"
           value={formData.identifier}
           onChange={handleChange}
           required
@@ -56,8 +56,15 @@ const Login = () => {
           value={formData.password}
           onChange={handleChange}
           required
-          style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
+          style={{ width: "100%", padding: "10px", marginBottom: "5px" }}
         />
+
+        <div style={{ textAlign: "right", marginBottom: "15px" }}>
+          <Link to="/forgot-password" style={{ fontSize: "0.9em", color: "blue" }}>
+            Forgot password?
+          </Link>
+        </div>
+
         <button type="submit" style={{ width: "100%", padding: "10px" }}>
           Login
         </button>

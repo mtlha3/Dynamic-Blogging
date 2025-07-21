@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom"; // <-- Import Link
+import { Link } from "react-router-dom";
 import API from "../../api/api";
 
 const Signup = () => {
@@ -45,7 +45,7 @@ const Signup = () => {
         <input
           type="text"
           name="identifier"
-          placeholder="Email or Username"
+          placeholder="Email"
           value={formData.identifier}
           onChange={handleChange}
           required

@@ -5,6 +5,7 @@ import Signup from "./components/Signup"
 import Home from "./pages/Home"
 import AddBlog from "./pages/AddBlog"
 import MyBlogs from "./pages/Myblogs"
+import ForgotPassword from "./Components/ForgotPassword"
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/add-blog" element={<AddBlog />} />
         <Route path="/my-blogs" element={<MyBlogs />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
     </Router>
   )

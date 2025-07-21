@@ -116,3 +116,63 @@ export const logout = (req, res) => {
   });
   res.status(200).json({ message: "Logged out successfully" });
 };
+//================
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ identifier: email });
+    if (!user) {
+      return res.status(404).json({ message: "No account with that email found" });
+    }
+
+    const token = crypto.randomBytes(20).toString("hex");
+
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await user.save();
+
+    const resetLink = `http://localhost:3000/reset-password/${token}`;
+    const emailBody = `
+      <p>You requested a password reset</p>
+      <p>Click this link to reset: <a href="${resetLink}">${resetLink}</a></p>
+    `;
+
+    await sendMail(user.identifier, "Password Reset", emailBody);
+
+    res.status(200).json({ message: "Password reset email sent" });
+  } catch (err) {
+    console.error("Error in forgotPassword:", err);
+    res.status(500).json({ message: "Error sending reset email" });
+  }
+};
+
+
+//==================
+
+export const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    user.password = password; 
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (err) {
+    console.error("Error in resetPassword:", err);
+    res.status(500).json({ message: "Error resetting password" });
+  }
+};
