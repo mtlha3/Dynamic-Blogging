@@ -5,7 +5,7 @@ import API from "../../api/api";
 const Signup = () => {
   const [formData, setFormData] = useState({
     name: "",
-    identifier: "",
+    email: "",
     password: ""
   });
 
@@ -43,10 +43,10 @@ const Signup = () => {
           style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
         />
         <input
-          type="text"
-          name="identifier"
+          type="email"
+          name="email"
           placeholder="Email"
-          value={formData.identifier}
+          value={formData.email}
           onChange={handleChange}
           required
           style={{ width: "100%", padding: "10px", marginBottom: "10px" }}

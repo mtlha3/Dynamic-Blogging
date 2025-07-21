@@ -14,29 +14,23 @@ const generateUserId = () => {
   return id;
 };
 
-const isEmail = (value) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-};
-
 export const signup = async (req, res) => {
   try {
-    const { identifier, name, password } = req.body;
+    const { name, email, password } = req.body;
 
-    if (!identifier || !name || !password) {
-      return res.status(400).json({ message: 'Identifier, name, and password are required.' });
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Name, email, and password are required.' });
     }
 
     if (password.length < 8) {
       return res.status(400).json({ message: 'Password must be at least 8 characters long.' });
     }
 
-    const existingUser = await User.findOne({
-      $or: [{ username: identifier }, { email: identifier }]
-    });
-
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ message: 'Username or email already in use.' });
+      return res.status(409).json({ message: 'Email already in use.' });
     }
+
     let userId;
     let exists = true;
     while (exists) {
@@ -44,20 +38,18 @@ export const signup = async (req, res) => {
       exists = await User.findOne({ userId });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const newUser = new User({
       userId,
       name,
-      password: hashedPassword,
-      ...(isEmail(identifier) ? { email: identifier } : { username: identifier })
+      email,
+      password // plain password — will be hashed by the schema hook
     });
 
     await newUser.save();
 
     res.status(201).json({
       message: 'User registered successfully',
-      userId: newUser.userId
+      userId: newUser.userId,
     });
 
   } catch (err) {
@@ -67,25 +59,27 @@ export const signup = async (req, res) => {
 };
 
 
+
 //========
 export const login = async (req, res) => {
   try {
-    const { identifier, password } = req.body;
+    const { email, password } = req.body;
+    console.log("🔐 Login Attempt:", email, password);
 
-    if (!identifier || !password) {
-      return res.status(400).json({ message: 'Identifier and password are required.' });
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required.' });
     }
 
-    const user = await User.findOne({
-      $or: [{ username: identifier }, { email: identifier }]
-    });
+    const user = await User.findOne({ email });
 
     if (!user) {
+      console.log("❌ No user found with this email.");
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.log("❌ Password does not match.");
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
@@ -167,7 +161,6 @@ export const verifyOtp = async (req, res) => {
 };
 
 //==============
-
 export const resetPassword = async (req, res) => {
   const { email, otp, password } = req.body;
 
@@ -190,8 +183,7 @@ export const resetPassword = async (req, res) => {
       return res.status(400).json({ message: "Password must be at least 8 characters long." });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    user.password = hashedPassword;
+    user.password = password;
     user.otp = null;
     user.otpExpires = null;
 
