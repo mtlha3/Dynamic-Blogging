@@ -42,7 +42,7 @@ export const signup = async (req, res) => {
       userId,
       name,
       email,
-      password // plain password — will be hashed by the schema hook
+      password 
     });
 
     await newUser.save();
@@ -64,7 +64,6 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log("🔐 Login Attempt:", email, password);
 
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required.' });
@@ -73,13 +72,11 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      console.log("❌ No user found with this email.");
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log("❌ Password does not match.");
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
