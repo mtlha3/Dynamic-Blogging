@@ -1,5 +1,7 @@
 import Blog from "../models/Blog.js";
 
+
+// Add blog controller
 const generateBlogId = () => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let blogId = '';
@@ -37,7 +39,7 @@ export const addBlog = async (req, res) => {
   }
 };
 
-//==============
+//============== Fetch blog post wrt to user ID
 export const getUserBlogs = async (req, res) => {
   try {
     const blogs = await Blog.find({ userId: req.user.userId }).sort({ date: -1 });
@@ -47,7 +49,7 @@ export const getUserBlogs = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch blogs" });
   }
 };
-//===========
+//=========== delete blog by userId and blogId
 export const deleteBlog = async (req, res) => {
   try {
     const { blogId } = req.params;
@@ -67,7 +69,7 @@ export const deleteBlog = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-//=====
+//======== Update blog by Blog Id and UserId
 export const updateBlog = async (req, res) => {
   try {
     const { blogId } = req.params;
@@ -93,10 +95,10 @@ export const updateBlog = async (req, res) => {
     res.status(500).json({ message: "Failed to update blog" });
   }
 };
-//=============
+//============= Fetch all blogs to home
 export const getAllBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find().sort({ date: -1 }); // Newest first
+    const blogs = await Blog.find().sort({ date: -1 });
     res.status(200).json({ blogs });
   } catch (err) {
     console.error("Error fetching all blogs:", err);

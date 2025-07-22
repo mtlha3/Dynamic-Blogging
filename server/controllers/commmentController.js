@@ -1,5 +1,7 @@
 import Comment from "../models/Comment.js";
 
+
+//======= Post Blog Controller
 export const addComment = async (req, res) => {
   try {
     const { commentText, blogId } = req.body;
@@ -23,9 +25,7 @@ export const addComment = async (req, res) => {
     res.status(500).json({ message: "Failed to add comment" });
   }
 };
-//==========
-
-
+//========== Comment fetch according to blog Id
 export const getCommentsByBlog = async (req, res) => {
   const { blogId } = req.params;
 

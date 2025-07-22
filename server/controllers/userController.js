@@ -5,6 +5,8 @@ import crypto from "crypto";
 import sendMail from '../utils/Email.js';
 
 
+
+//======= Signup Controller
 const generateUserId = () => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let id = '';
@@ -60,7 +62,7 @@ export const signup = async (req, res) => {
 
 
 
-//========
+//======== Login Controller
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -101,7 +103,7 @@ export const login = async (req, res) => {
   }
 };
 
-//=====
+//======= Logout Controller
 export const logout = (req, res) => {
   res.clearCookie("auth_token", {
     httpOnly: true,
@@ -110,7 +112,8 @@ export const logout = (req, res) => {
   });
   res.status(200).json({ message: "Logged out successfully" });
 };
-//================
+
+//================ Forgot Password Functionality
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
@@ -134,7 +137,7 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-//========================
+//==================== Verify Otp Controller
 
 export const verifyOtp = async (req, res) => {
   const { email, otp } = req.body;
@@ -157,7 +160,7 @@ export const verifyOtp = async (req, res) => {
   }
 };
 
-//==============
+//============== Reset Password Controller
 export const resetPassword = async (req, res) => {
   const { email, otp, password } = req.body;
 
