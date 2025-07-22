@@ -31,15 +31,20 @@ const Home = () => {
 
   useEffect(() => {
     const fetchAllBlogs = async () => {
-      try {
-        const res = await API.get("/blogs/all")
-        setBlogs(res.data.blogs)
-      } catch (err) {
-        setMessage("Failed to fetch blogs.")
-      } finally {
-        setLoading(false)
-      }
-    }
+  try {
+    const res = await API.get("/blogs/all")
+    const shuffledBlogs = res.data.blogs
+      .map((blog) => ({ blog, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ blog }) => blog)
+    setBlogs(shuffledBlogs)
+  } catch (err) {
+    setMessage("Failed to fetch blogs.")
+  } finally {
+    setLoading(false)
+  }
+}
+
     fetchAllBlogs()
   }, [])
 
