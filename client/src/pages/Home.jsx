@@ -12,7 +12,6 @@ const Home = () => {
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState({});
 
-  // Get current user
   useEffect(() => {
   const fetchUser = async () => {
     API.get("/users/me", { withCredentials: true })
@@ -30,9 +29,6 @@ const Home = () => {
   fetchUser();
 }, []);
 
-
-
-  // Get all blogs
   useEffect(() => {
     const fetchAllBlogs = async () => {
       try {
@@ -153,7 +149,6 @@ const Home = () => {
                         Send
                       </button>
 
-                      {/* Comments Section */}
                       {comments[blog.blogId]?.length > 0 ? (
                         comments[blog.blogId].map((c, idx) => {
                           const isMyComment = c.userId === user?.userId;

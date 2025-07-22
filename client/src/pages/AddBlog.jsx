@@ -25,7 +25,7 @@ const AddBlog = () => {
       });
 
       setMessage("Blog added successfully!");
-      navigate("/my-blogs"); // Or redirect wherever you want
+      navigate("/my-blogs");
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Failed to add blog";
       setMessage(errorMsg);

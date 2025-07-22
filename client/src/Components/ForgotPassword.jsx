@@ -3,7 +3,7 @@ import API from "../../api/api";
 import { Link } from "react-router-dom";
 
 const ForgotPassword = () => {
-  const [step, setStep] = useState(1); // Step 1: email, Step 2: OTP, Step 3: new password
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
