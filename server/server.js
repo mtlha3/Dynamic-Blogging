@@ -13,7 +13,10 @@ dotenv.config();
 const app = express();
 connectDB();
 
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({
+  origin: "https://blog-space-indol.vercel.app",
+  credentials: true,
+}));
 
 app.use(express.json());
 app.use(cookieParser())
