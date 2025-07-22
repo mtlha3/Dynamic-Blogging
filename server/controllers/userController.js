@@ -108,11 +108,12 @@ export const login = async (req, res) => {
 export const logout = (req, res) => {
   res.clearCookie("auth_token", {
     httpOnly: true,
-    sameSite: "strict",
-    secure: process.env.NODE_ENV === "production"
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
   });
   res.status(200).json({ message: "Logged out successfully" });
 };
+
 
 //================ Forgot Password Functionality
 export const forgotPassword = async (req, res) => {
