@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { MessageCircle, User, Calendar, Send, Loader2 } from "lucide-react"
+import { MessageCircle, User, Calendar, Send, Loader2, ChevronDown, ChevronUp } from "lucide-react"
 import API from "../../api/api"
 
 const Home = () => {
@@ -11,6 +11,7 @@ const Home = () => {
   const [showCommentBox, setShowCommentBox] = useState(null)
   const [commentText, setCommentText] = useState("")
   const [comments, setComments] = useState({})
+  const [expandedBlogs, setExpandedBlogs] = useState({}) 
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -71,9 +72,25 @@ const Home = () => {
     if (!isOpen) fetchComments(blogId)
   }
 
+  const toggleBlogExpansion = (blogId) => {
+    setExpandedBlogs((prev) => ({
+      ...prev,
+      [blogId]: !prev[blogId],
+    }))
+  }
+
+  const truncateText = (text, maxLength = 200) => {
+    if (text.length <= maxLength) return text
+    return text.substring(0, maxLength) + "..."
+  }
+
+  const needsTruncation = (text, maxLength = 200) => {
+    return text.length > maxLength
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 relative overflow-hidden">
-      {/* Background decorative elements */}
+
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-violet-400/10 to-purple-600/10 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-pink-400/10 to-violet-600/10 rounded-full blur-3xl"></div>
@@ -81,7 +98,7 @@ const Home = () => {
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto p-6">
-        {/* Header */}
+      
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent mb-4">
             Welcome to Our Blog
@@ -89,7 +106,6 @@ const Home = () => {
           <p className="text-gray-600 text-lg font-medium">Discover amazing stories and share your thoughts</p>
         </div>
 
-        {/* User greeting */}
         {user && (
           <div className="bg-white/60 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-6 mb-8">
             <div className="flex items-center space-x-3">
@@ -104,7 +120,6 @@ const Home = () => {
           </div>
         )}
 
-        {/* Blogs Section */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
             <MessageCircle className="w-6 h-6 mr-2 text-violet-600" />
@@ -131,124 +146,148 @@ const Home = () => {
             </div>
           ) : (
             <div className="space-y-6">
-              {blogs.map((blog) => (
-                <div
-                  key={blog.blogId}
-                  className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                >
-                  {/* Blog Header */}
-                  <div className="mb-4">
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">{blog.title}</h3>
-                    <p className="text-gray-600 leading-relaxed">{blog.description}</p>
-                  </div>
+              {blogs.map((blog) => {
+                const isExpanded = expandedBlogs[blog.blogId]
+                const showReadMore = needsTruncation(blog.description)
 
-                  {/* Blog Meta */}
-                  <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4 pb-4 border-b border-gray-200/50">
-                    <div className="flex items-center space-x-1">
-                      <User className="w-4 h-4" />
-                      <span className="font-medium">{blog.userName}</span>
+                return (
+                  <div
+                    key={blog.blogId}
+                    className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                  >
+                    <div className="mb-4">
+                      <h3 className="text-xl font-bold text-gray-800 mb-3">{blog.title}</h3>
+
+                      <div className="text-gray-600 leading-relaxed">
+                        <p className="whitespace-pre-wrap">
+                          {isExpanded ? blog.description : truncateText(blog.description)}
+                        </p>
+
+                        {showReadMore && (
+                          <button
+                            onClick={() => toggleBlogExpansion(blog.blogId)}
+                            className="inline-flex items-center space-x-1 mt-3 px-3 py-1.5 bg-gradient-to-r from-violet-500/10 to-purple-500/10 hover:from-violet-500/20 hover:to-purple-500/20 text-violet-700 font-medium rounded-lg transition-all duration-200 border border-violet-200/50 hover:border-violet-300/50"
+                          >
+                            <span>{isExpanded ? "Read Less" : "Read More"}</span>
+                            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-1">
-                      <Calendar className="w-4 h-4" />
-                      <span>{new Date(blog.date).toLocaleDateString()}</span>
+
+                    <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4 pb-4 border-b border-gray-200/50">
+                      <div className="flex items-center space-x-1">
+                        <User className="w-4 h-4" />
+                        <span className="font-medium">{blog.userName}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Calendar className="w-4 h-4" />
+                        <span>{new Date(blog.date).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex items-center space-x-1 text-xs">
+                        <span className="px-2 py-1 bg-violet-100 text-violet-700 rounded-full">
+                          {blog.description.split(" ").length} words
+                        </span>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Comment Section */}
-                  <div>
-                    {user ? (
-                      <>
-                        <button
-                          onClick={() => toggleCommentBox(blog.blogId)}
-                          className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                          <span>{showCommentBox === blog.blogId ? "Hide Comments" : "Add/View Comments"}</span>
-                        </button>
+                    <div>
+                      {user ? (
+                        <>
+                          <button
+                            onClick={() => toggleCommentBox(blog.blogId)}
+                            className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                            <span>{showCommentBox === blog.blogId ? "Hide Comments" : "Add/View Comments"}</span>
+                          </button>
 
-                        {showCommentBox === blog.blogId && (
-                          <div className="mt-6 p-4 bg-white/50 rounded-xl border border-white/30">
-                            {/* Comment Input */}
-                            <div className="mb-4">
-                              <textarea
-                                rows={3}
-                                placeholder="Write your comment..."
-                                value={commentText}
-                                onChange={(e) => setCommentText(e.target.value)}
-                                className="w-full p-3 bg-white/70 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all duration-200 resize-none"
-                              />
-                              <button
-                                onClick={() => handleSendComment(blog.blogId)}
-                                className="mt-2 inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
-                              >
-                                <Send className="w-4 h-4" />
-                                <span>Send</span>
-                              </button>
-                            </div>
+                          {showCommentBox === blog.blogId && (
+                            <div className="mt-6 p-4 bg-white/50 rounded-xl border border-white/30">
+                           
+                              <div className="mb-4">
+                                <textarea
+                                  rows={3}
+                                  placeholder="Write your comment..."
+                                  value={commentText}
+                                  onChange={(e) => setCommentText(e.target.value)}
+                                  className="w-full p-3 bg-white/70 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all duration-200 resize-none"
+                                />
+                                <button
+                                  onClick={() => handleSendComment(blog.blogId)}
+                                  className="mt-2 inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
+                                >
+                                  <Send className="w-4 h-4" />
+                                  <span>Send</span>
+                                </button>
+                              </div>
 
-                            {/* Comments List */}
-                            <div className="space-y-3">
-                              {comments[blog.blogId]?.length > 0 ? (
-                                comments[blog.blogId].map((c, idx) => {
-                                  const isMyComment = c.userId === user?.userId
-                                  return (
-                                    <div key={idx} className={`flex ${isMyComment ? "justify-end" : "justify-start"}`}>
+                              <div className="space-y-3">
+                                {comments[blog.blogId]?.length > 0 ? (
+                                  comments[blog.blogId].map((c, idx) => {
+                                    const isMyComment = c.userId === user?.userId
+                                    return (
                                       <div
-                                        className={`max-w-[70%] p-3 rounded-2xl shadow-sm ${
-                                          isMyComment
-                                            ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white"
-                                            : "bg-white/80 text-gray-800 border border-gray-200/50"
-                                        }`}
+                                        key={idx}
+                                        className={`flex ${isMyComment ? "justify-end" : "justify-start"}`}
                                       >
-                                        <div className="flex items-center space-x-2 mb-1">
-                                          <div
-                                            className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                                              isMyComment ? "bg-white/20 text-white" : "bg-violet-100 text-violet-600"
-                                            }`}
-                                          >
-                                            {c.userName.charAt(0).toUpperCase()}
-                                          </div>
-                                          <span
-                                            className={`text-sm font-medium ${
-                                              isMyComment ? "text-white/90" : "text-gray-700"
-                                            }`}
-                                          >
-                                            {c.userName}
-                                          </span>
-                                        </div>
-                                        <p
-                                          className={`text-sm leading-relaxed ${
-                                            isMyComment ? "text-white" : "text-gray-700"
+                                        <div
+                                          className={`max-w-[70%] p-3 rounded-2xl shadow-sm ${
+                                            isMyComment
+                                              ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white"
+                                              : "bg-white/80 text-gray-800 border border-gray-200/50"
                                           }`}
                                         >
-                                          {c.commentText}
-                                        </p>
+                                          <div className="flex items-center space-x-2 mb-1">
+                                            <div
+                                              className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                                isMyComment ? "bg-white/20 text-white" : "bg-violet-100 text-violet-600"
+                                              }`}
+                                            >
+                                              {c.userName.charAt(0).toUpperCase()}
+                                            </div>
+                                            <span
+                                              className={`text-sm font-medium ${
+                                                isMyComment ? "text-white/90" : "text-gray-700"
+                                              }`}
+                                            >
+                                              {c.userName}
+                                            </span>
+                                          </div>
+                                          <p
+                                            className={`text-sm leading-relaxed ${
+                                              isMyComment ? "text-white" : "text-gray-700"
+                                            }`}
+                                          >
+                                            {c.commentText}
+                                          </p>
+                                        </div>
                                       </div>
-                                    </div>
-                                  )
-                                })
-                              ) : (
-                                <div className="text-center py-6">
-                                  <MessageCircle className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                                  <p className="text-gray-500 font-medium">No comments yet.</p>
-                                  <p className="text-gray-400 text-sm">Be the first to share your thoughts!</p>
-                                </div>
-                              )}
+                                    )
+                                  })
+                                ) : (
+                                  <div className="text-center py-6">
+                                    <MessageCircle className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                                    <p className="text-gray-500 font-medium">No comments yet.</p>
+                                    <p className="text-gray-400 text-sm">Be the first to share your thoughts!</p>
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <Link to="/login">
-                        <button className="inline-flex items-center space-x-2 px-4 py-2 bg-white/60 hover:bg-white/80 border border-violet-200 hover:border-violet-300 text-violet-700 font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg">
-                          <User className="w-4 h-4" />
-                          <span>Login to share your views on this blog</span>
-                        </button>
-                      </Link>
-                    )}
+                          )}
+                        </>
+                      ) : (
+                        <Link to="/login">
+                          <button className="inline-flex items-center space-x-2 px-4 py-2 bg-white/60 hover:bg-white/80 border border-violet-200 hover:border-violet-300 text-violet-700 font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg">
+                            <User className="w-4 h-4" />
+                            <span>Login to share your views on this blog</span>
+                          </button>
+                        </Link>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>

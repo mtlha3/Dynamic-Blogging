@@ -1,5 +1,19 @@
+"use client"
+
 import { useEffect, useState } from "react"
-import { Loader2, Edit3, Trash2, Calendar, FileText, Save, X, Plus, BookOpen } from "lucide-react"
+import {
+  Loader2,
+  Edit3,
+  Trash2,
+  Calendar,
+  FileText,
+  Save,
+  X,
+  Plus,
+  BookOpen,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react"
 import API from "../../api/api"
 
 const MyBlogs = () => {
@@ -13,6 +27,7 @@ const MyBlogs = () => {
     date: "",
   })
   const [updating, setUpdating] = useState(false)
+  const [expandedBlogs, setExpandedBlogs] = useState({})
 
   useEffect(() => {
     fetchBlogs()
@@ -69,9 +84,24 @@ const MyBlogs = () => {
     }
   }
 
+  const toggleBlogExpansion = (blogId) => {
+    setExpandedBlogs((prev) => ({
+      ...prev,
+      [blogId]: !prev[blogId],
+    }))
+  }
+
+  const truncateText = (text, maxLength = 200) => {
+    if (text.length <= maxLength) return text
+    return text.substring(0, maxLength) + "..."
+  }
+
+  const needsTruncation = (text, maxLength = 200) => {
+    return text.length > maxLength
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 relative overflow-hidden">
-  
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-violet-400/10 to-purple-600/10 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-pink-400/10 to-violet-600/10 rounded-full blur-3xl"></div>
@@ -79,7 +109,6 @@ const MyBlogs = () => {
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto p-6">
-     
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl mb-4 shadow-lg">
             <BookOpen className="w-8 h-8 text-white" />
@@ -145,121 +174,147 @@ const MyBlogs = () => {
               </div>
             )}
 
-            {blogs.map((blog) => (
-              <div
-                key={blog.blogId}
-                className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-6 hover:shadow-xl transition-all duration-300"
-              >
-                {editingBlogId === blog.blogId ? (
-                  /* Edit Form */
-                  <form onSubmit={handleUpdate} className="space-y-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-gray-700 block">Blog Title</label>
-                      <div className="relative group">
-                        <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-violet-500 transition-colors duration-200" />
-                        <input
-                          type="text"
-                          name="title"
-                          value={editData.title}
-                          onChange={handleEditChange}
-                          required
-                          className="w-full pl-11 pr-4 py-3 h-12 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all duration-200 hover:bg-white/70"
-                        />
-                      </div>
-                    </div>
+            {blogs.map((blog) => {
+              const isExpanded = expandedBlogs[blog.blogId]
+              const showReadMore = needsTruncation(blog.description)
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-gray-700 block">Blog Content</label>
-                      <div className="relative group">
-                        <Edit3 className="absolute left-3 top-4 h-5 w-5 text-gray-400 group-focus-within:text-violet-500 transition-colors duration-200" />
-                        <textarea
-                          name="description"
-                          value={editData.description}
-                          onChange={handleEditChange}
-                          required
-                          rows={6}
-                          className="w-full pl-11 pr-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all duration-200 hover:bg-white/70 resize-none"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-gray-700 block">Publication Date</label>
-                      <div className="relative group">
-                        <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-violet-500 transition-colors duration-200" />
-                        <input
-                          type="date"
-                          name="date"
-                          value={editData.date}
-                          onChange={handleEditChange}
-                          required
-                          className="w-full pl-11 pr-4 py-3 h-12 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all duration-200 hover:bg-white/70"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex space-x-3 pt-4">
-                      <button
-                        type="submit"
-                        disabled={updating}
-                        className="flex-1 inline-flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:transform-none"
-                      >
-                        {updating ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Saving...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Save className="w-4 h-4" />
-                            <span>Save Changes</span>
-                          </>
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setEditingBlogId(null)}
-                        className="flex-1 inline-flex items-center justify-center space-x-2 px-4 py-3 bg-white/60 hover:bg-white/80 border border-gray-200 hover:border-gray-300 text-gray-700 font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
-                      >
-                        <X className="w-4 h-4" />
-                        <span>Cancel</span>
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <>
-                    <div className="mb-4">
-                      <h3 className="text-xl font-bold text-gray-800 mb-2">{blog.title}</h3>
-                      <p className="text-gray-600 leading-relaxed">{blog.description}</p>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        <Calendar className="w-4 h-4" />
-                        <span>Published on {new Date(blog.date).toLocaleDateString()}</span>
+              return (
+                <div
+                  key={blog.blogId}
+                  className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-6 hover:shadow-xl transition-all duration-300"
+                >
+                  {editingBlogId === blog.blogId ? (
+                    <form onSubmit={handleUpdate} className="space-y-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-700 block">Blog Title</label>
+                        <div className="relative group">
+                          <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-violet-500 transition-colors duration-200" />
+                          <input
+                            type="text"
+                            name="title"
+                            value={editData.title}
+                            onChange={handleEditChange}
+                            required
+                            className="w-full pl-11 pr-4 py-3 h-12 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all duration-200 hover:bg-white/70"
+                          />
+                        </div>
                       </div>
 
-                      <div className="flex space-x-3">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-700 block">Blog Content</label>
+                        <div className="relative group">
+                          <Edit3 className="absolute left-3 top-4 h-5 w-5 text-gray-400 group-focus-within:text-violet-500 transition-colors duration-200" />
+                          <textarea
+                            name="description"
+                            value={editData.description}
+                            onChange={handleEditChange}
+                            required
+                            rows={6}
+                            className="w-full pl-11 pr-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all duration-200 hover:bg-white/70 resize-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-700 block">Publication Date</label>
+                        <div className="relative group">
+                          <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-violet-500 transition-colors duration-200" />
+                          <input
+                            type="date"
+                            name="date"
+                            value={editData.date}
+                            onChange={handleEditChange}
+                            required
+                            className="w-full pl-11 pr-4 py-3 h-12 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all duration-200 hover:bg-white/70"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex space-x-3 pt-4">
                         <button
-                          onClick={() => handleEdit(blog)}
-                          className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                          type="submit"
+                          disabled={updating}
+                          className="flex-1 inline-flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:transform-none"
                         >
-                          <Edit3 className="w-4 h-4" />
-                          <span>Edit</span>
+                          {updating ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <span>Saving...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Save className="w-4 h-4" />
+                              <span>Save Changes</span>
+                            </>
+                          )}
                         </button>
                         <button
-                          onClick={() => handleDelete(blog.blogId)}
-                          className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                          type="button"
+                          onClick={() => setEditingBlogId(null)}
+                          className="flex-1 inline-flex items-center justify-center space-x-2 px-4 py-3 bg-white/60 hover:bg-white/80 border border-gray-200 hover:border-gray-300 text-gray-700 font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
                         >
-                          <Trash2 className="w-4 h-4" />
-                          <span>Delete</span>
+                          <X className="w-4 h-4" />
+                          <span>Cancel</span>
                         </button>
                       </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
+                    </form>
+                  ) : (
+                    <>
+                      <div className="mb-4">
+                        <h3 className="text-xl font-bold text-gray-800 mb-3">{blog.title}</h3>
+
+                        <div className="text-gray-600 leading-relaxed">
+                          <p className="whitespace-pre-wrap">
+                            {isExpanded ? blog.description : truncateText(blog.description)}
+                          </p>
+
+                          {showReadMore && (
+                            <button
+                              onClick={() => toggleBlogExpansion(blog.blogId)}
+                              className="inline-flex items-center space-x-1 mt-3 px-3 py-1.5 bg-gradient-to-r from-violet-500/10 to-purple-500/10 hover:from-violet-500/20 hover:to-purple-500/20 text-violet-700 font-medium rounded-lg transition-all duration-200 border border-violet-200/50 hover:border-violet-300/50"
+                            >
+                              <span>{isExpanded ? "Read Less" : "Read More"}</span>
+                              {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-2 text-sm text-gray-500">
+                            <Calendar className="w-4 h-4" />
+                            <span>Published on {new Date(blog.date).toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex items-center space-x-1 text-xs">
+                            <span className="px-2 py-1 bg-violet-100 text-violet-700 rounded-full">
+                              {blog.description.split(" ").length} words
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex space-x-3">
+                          <button
+                            onClick={() => handleEdit(blog)}
+                            className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => handleDelete(blog.blogId)}
+                            className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span>Delete</span>
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
       </div>
