@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Loader2, PenTool, Calendar, FileText, Send, ArrowLeft } from "lucide-react"
@@ -42,7 +40,7 @@ const AddBlog = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 relative overflow-hidden">
-      {/* Background decorative elements */}
+     
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-violet-400/20 to-purple-600/20 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-pink-400/20 to-violet-600/20 rounded-full blur-3xl"></div>
@@ -50,7 +48,7 @@ const AddBlog = () => {
       </div>
 
       <div className="relative z-10 max-w-2xl mx-auto p-6">
-        {/* Back Button */}
+     
         <button
           onClick={() => navigate(-1)}
           className="mb-6 inline-flex items-center space-x-2 px-4 py-2 bg-white/60 hover:bg-white/80 backdrop-blur-xl border border-white/20 text-violet-700 font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
@@ -59,13 +57,12 @@ const AddBlog = () => {
           <span>Back</span>
         </button>
 
-        {/* Main Card */}
         <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 p-8 relative overflow-hidden">
-          {/* Card decorative gradient */}
+          
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/20 rounded-2xl"></div>
 
           <div className="relative z-10">
-            {/* Header */}
+         
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl mb-4 shadow-lg">
                 <PenTool className="w-8 h-8 text-white" />
@@ -137,7 +134,6 @@ const AddBlog = () => {
                 </div>
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={submitting}
@@ -157,7 +153,6 @@ const AddBlog = () => {
               </button>
             </form>
 
-            {/* Message display */}
             {message && (
               <div
                 className={`mt-6 p-4 rounded-xl border transition-all duration-300 ${
@@ -193,7 +188,6 @@ const AddBlog = () => {
               </div>
             )}
 
-            {/* Tips Section */}
             <div className="mt-8 p-4 bg-violet-50/50 rounded-xl border border-violet-100">
               <h3 className="text-sm font-semibold text-violet-800 mb-2">💡 Writing Tips</h3>
               <ul className="text-xs text-violet-700 space-y-1">
