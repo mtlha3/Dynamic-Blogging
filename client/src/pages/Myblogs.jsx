@@ -324,7 +324,7 @@
 
 // export default MyBlogs
 
-"use client";
+
 
 import { useEffect, useState } from "react";
 import {
@@ -382,13 +382,15 @@ const MyBlogs = () => {
   };
 
   const handleEdit = (blog) => {
-    setEditingBlogId(blog.blogId);
-    setEditData({
-      title: blog.title,
-      description: blog.description,
-      date: blog.date.slice(0, 10),
-    });
-  };
+  const today = new Date().toISOString().slice(0, 10);
+  setEditingBlogId(blog.blogId);
+  setEditData({
+    title: blog.title,
+    description: blog.description,
+    date: today,
+  });
+};
+
 
   const handleEditChange = (e) => {
     setEditData({ ...editData, [e.target.name]: e.target.value });
@@ -497,10 +499,10 @@ const MyBlogs = () => {
                         type="date"
                         name="date"
                         value={editData.date}
-                        onChange={handleEditChange}
-                        required
-                        className="w-full p-2 border rounded"
+                        readOnly
+                        className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed text-gray-600"
                       />
+
                       <div className="flex gap-3">
                         <button
                           type="submit"
