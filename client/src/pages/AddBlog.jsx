@@ -12,6 +12,11 @@ const AddBlog = () => {
   })
   const [message, setMessage] = useState("")
   const [submitting, setSubmitting] = useState(false)
+  
+    useEffect(() => {
+    const today = new Date().toISOString().slice(0, 10)
+    setFormData((prev) => ({ ...prev, date: today }))
+  }, [])
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -40,7 +45,7 @@ const AddBlog = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 relative overflow-hidden">
-     
+
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-violet-400/20 to-purple-600/20 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-pink-400/20 to-violet-600/20 rounded-full blur-3xl"></div>
@@ -48,7 +53,7 @@ const AddBlog = () => {
       </div>
 
       <div className="relative z-10 max-w-2xl mx-auto p-6">
-     
+
         <button
           onClick={() => navigate(-1)}
           className="mb-6 inline-flex items-center space-x-2 px-4 py-2 bg-white/60 hover:bg-white/80 backdrop-blur-xl border border-white/20 text-violet-700 font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
@@ -58,11 +63,11 @@ const AddBlog = () => {
         </button>
 
         <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 p-8 relative overflow-hidden">
-          
+
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/20 rounded-2xl"></div>
 
           <div className="relative z-10">
-         
+
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl mb-4 shadow-lg">
                 <PenTool className="w-8 h-8 text-white" />
@@ -127,10 +132,10 @@ const AddBlog = () => {
                     type="date"
                     name="date"
                     value={formData.date}
-                    onChange={handleChange}
-                    required
+                    readOnly
                     className="w-full pl-11 pr-4 py-3 h-12 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all duration-200 hover:bg-white/70"
                   />
+
                 </div>
               </div>
 
@@ -155,11 +160,10 @@ const AddBlog = () => {
 
             {message && (
               <div
-                className={`mt-6 p-4 rounded-xl border transition-all duration-300 ${
-                  message.includes("successfully") || message.includes("success")
+                className={`mt-6 p-4 rounded-xl border transition-all duration-300 ${message.includes("successfully") || message.includes("success")
                     ? "bg-green-50 border-green-200 text-green-800"
                     : "bg-red-50 border-red-200 text-red-800"
-                }`}
+                  }`}
               >
                 <div className="flex items-center space-x-2">
                   {message.includes("successfully") ? (
