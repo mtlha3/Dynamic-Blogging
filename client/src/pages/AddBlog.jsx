@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { Loader2, PenTool, Calendar, FileText, Send, ArrowLeft } from "lucide-react"
 import API from "../../api/api"
@@ -12,7 +12,7 @@ const AddBlog = () => {
   })
   const [message, setMessage] = useState("")
   const [submitting, setSubmitting] = useState(false)
-  
+
     useEffect(() => {
     const today = new Date().toISOString().slice(0, 10)
     setFormData((prev) => ({ ...prev, date: today }))
