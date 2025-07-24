@@ -17,7 +17,7 @@ const ForgotPassword = () => {
     setMessage("")
     try {
       const res = await API.post("/users/forgot-password", { email })
-      setMessage(res.data.message || "OTP sent to your email.")
+      setMessage(res.data.message || "OTP sent to your email....")
       setStep(2)
     } catch (err) {
       setMessage(err.response?.data?.message || "Something went wrong.")
